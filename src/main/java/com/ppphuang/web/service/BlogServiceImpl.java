@@ -3,12 +3,15 @@ package com.ppphuang.web.service;
 import com.ppphuang.web.beans.Blog;
 import com.ppphuang.web.dao.BlogRepository;
 import com.ppphuang.web.exception.NotFoundException;
+import com.ppphuang.web.util.MarkdownUtils;
 import com.ppphuang.web.util.MyBeanUtils;
 import com.ppphuang.web.vo.BlogQuery;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +50,19 @@ public class BlogServiceImpl implements BlogService{
     }
 
     @Override
+    public Blog getAndConvert(Long id) {
+        Blog blog = blogRepository.findById(id).orElse(null);
+        if (blog == null) {
+            throw new NotFoundException("博客不存在");
+        }
+        Blog blog1 = new Blog();
+        BeanUtils.copyProperties(blog, blog1);
+        String content = blog1.getContent();
+        blog1.setContent(MarkdownUtils.markdownToHtmlExtensions(content));
+        return blog1;
+    }
+
+    @Override
     public Page<Blog> listBlog(Pageable pageable, BlogQuery blogQuery) {
         return blogRepository.findAll(new Specification<Blog>() {
             @Override
@@ -65,6 +81,23 @@ public class BlogServiceImpl implements BlogService{
                 return null;
             }
         }, pageable);
+    }
+
+    @Override
+    public Page<Blog> listBlog(Pageable pageable) {
+        return blogRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Blog> listBlog(String query, Pageable pageable) {
+        return blogRepository.findByQuery(query,pageable);
+    }
+
+    @Override
+    public List<Blog> listRecommendBlogTop(Integer size) {
+        Sort by = Sort.by(Sort.Direction.DESC, "updateTime");
+        Pageable pageable = PageRequest.of(0, size, by);
+        return blogRepository.findTop(pageable);
     }
 
     @Override
