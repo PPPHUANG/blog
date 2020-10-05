@@ -21,10 +21,21 @@ public class Comment {
     private Blog blog;
 
     @OneToMany(mappedBy = "parentComment")
-    private List<Comment> replayComments = new ArrayList<>();
+    private List<Comment> replyComments = new ArrayList<>();
 
     @ManyToOne
     private Comment parentComment;
+
+    private boolean adminComment;
+
+    public boolean isAdminComment() {
+        return adminComment;
+    }
+
+    public void setAdminComment(boolean adminComment) {
+        this.adminComment = adminComment;
+    }
+
     public Comment() {
     }
 
@@ -36,12 +47,12 @@ public class Comment {
         this.blog = blog;
     }
 
-    public List<Comment> getReplayComments() {
-        return replayComments;
+    public List<Comment> getReplyComments() {
+        return replyComments;
     }
 
-    public void setReplayComments(List<Comment> replayComments) {
-        this.replayComments = replayComments;
+    public void setReplyComments(List<Comment> replayComments) {
+        this.replyComments = replayComments;
     }
 
     public Comment getParentComment() {

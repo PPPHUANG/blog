@@ -5,3 +5,5 @@ spring:
 #    suffix: .html
   profiles:
     active: dev
+
+comment.avatar: /images/avatar.png
